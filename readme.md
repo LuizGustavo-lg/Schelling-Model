@@ -1,0 +1,1 @@
+# Modelo de Segregação social de Schering
