@@ -2,10 +2,11 @@
 #include <ctime>
 #include <iomanip>
 #include <cmath>
+
 using namespace std;
 
-
 struct Paint{
+    //biblioteca de cores 
     const string BOLD       = "\033[1m";
 
     const string C_BLACK    = "\033[30m";
@@ -29,11 +30,37 @@ struct Paint{
 
 
 struct SegregacaoConfig{
-    int tamanho_mt = 10;
+    //conf da matriz
+    int tamanho_mt = 50;
     unsigned seed;
-    int tolerancia = 5;
-    float tx_casas_vazias = 0.1;
+    int tolerancia = 4;
+    float tx_casas_vazias = 0.05;
 };
+
+void imprimir_matriz(int mt[], int tamanho_mt);
+void iniciar_matriz(int mt[], SegregacaoConfig conf);
+void iniciar_matriz_null_map(int mt_first[], int mt_null_map[], int tamanho_mt);
+int  verify_eight(int mt[], int indice, int tamanho_mt);
+void schering_model(int mt[], int null_map[], SegregacaoConfig conf);
+
+
+int main(){
+    SegregacaoConfig conf;
+    conf.seed = time(0);
+    int bairro[conf.tamanho_mt*conf.tamanho_mt];
+    int null_map[(int) ((conf.tamanho_mt*conf.tamanho_mt) * conf.tx_casas_vazias)];
+    
+    srand(conf.seed);
+
+    iniciar_matriz(bairro, conf);
+    
+    iniciar_matriz_null_map(bairro, null_map, conf.tamanho_mt);
+
+    imprimir_matriz(bairro, conf.tamanho_mt);
+
+    schering_model(bairro, null_map, conf);
+
+}
 
 
 void imprimir_matriz(int mt[], int tamanho_mt){
@@ -43,14 +70,15 @@ void imprimir_matriz(int mt[], int tamanho_mt){
     Paint p;
     const string RESET_COLOR = p.C_BLACK;
 
+    cout << '\n';
     cout << p.BOLD;
     for (int i = 0; i < pow(tamanho_mt, 2); i++){
         switch (mt[i]){
         case 1:
-            cout << p.C_BLUE;
+            cout << p.C_MAGENTA;
             break;
         case 2:
-            cout << p.C_GREEN;
+            cout << p.C_CYAN;
             break;
         case 0:
             cout << p.C_GRAY;
@@ -68,12 +96,14 @@ void imprimir_matriz(int mt[], int tamanho_mt){
         };
     }
     cout << RESET_COLOR;
+
 }
 
 
 void iniciar_matriz(int mt[], SegregacaoConfig conf){
-    int i;
     // Inicia a matriz bairro de modo que todos os termos sejam randomizados
+    
+    int i;
 
     for (i = 0; i < pow(conf.tamanho_mt, 2)*(1-conf.tx_casas_vazias); i+=2){
         mt[i] = 1;
@@ -91,16 +121,73 @@ void iniciar_matriz(int mt[], SegregacaoConfig conf){
         mt[i] = mt[i_rand];
         mt[i_rand] = aux;
     } 
+
 }
 
 
-int main(){
-    SegregacaoConfig conf;
-    conf.seed = time(0);
-    int bairro[conf.tamanho_mt*conf.tamanho_mt];
-    
-    srand(conf.seed);
+void iniciar_matriz_null_map(int mt_first[], int mt_null_map[], int tamanho_mt){
+    // inicia a matriz mapa, que contendo todas as casas vazias
 
-    iniciar_matriz(bairro, conf);
-    imprimir_matriz(bairro, conf.tamanho_mt);
+    int j = 0;
+    for (int i = 0; i < pow(tamanho_mt, 2); i++) {
+        if (mt_first[i] == 0){
+            mt_null_map[j] = i;
+            j++;
+        }
+    }
+}
+
+
+int verify_eight(int mt[], int indice, int tamanho_mt) {
+    if (mt[indice] == 0) return 0;
+    
+    int pts = 0;
+
+    // Coordenadas do ponto central
+    int row = indice / tamanho_mt;
+    int col = indice % tamanho_mt;
+
+    // Array de deslocamentos para os oito vizinhos
+    int dRow[] = {-1, -1, -1, 0, 0, 1, 1, 1};
+    int dCol[] = {-1, 0, 1, -1, 1, -1, 0, 1};
+
+    for (int i = 0; i < 8; i++) {
+        int newRow = row + dRow[i];
+        int newCol = col + dCol[i];
+        int newIndex = newRow * tamanho_mt + newCol;
+
+        // Verifica se o novo índice está dentro dos limites
+        if (newRow >= 0 && newRow < tamanho_mt && newCol >= 0 && newCol < tamanho_mt) {
+            if (mt[indice] != mt[newIndex] && mt[newIndex] != 0) {
+                ++pts;
+            }
+        }
+    }
+
+    return pts;
+}
+
+
+void schering_model(int mt[], int null_map[], SegregacaoConfig conf){
+    while (true){
+        bool alterou = false;
+        for (int i = 0; i < pow(conf.tamanho_mt, 2); i++){
+            int pts;
+            pts = verify_eight(mt, i, conf.tamanho_mt);
+            
+            if (pts > conf.tolerancia) {
+                int indice_null_map = rand() % (int) ((conf.tamanho_mt*conf.tamanho_mt) * conf.tx_casas_vazias);
+
+                mt[null_map[indice_null_map]] = mt[i];
+                mt[i] = 0;
+                null_map[indice_null_map] = i;
+                alterou = true;
+            }
+        }
+
+        imprimir_matriz(mt, conf.tamanho_mt);
+
+        if (!alterou) break;
+    }
+    
 }
