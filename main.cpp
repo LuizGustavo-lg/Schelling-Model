@@ -6,7 +6,8 @@
 using namespace std;
 
 struct Paint{
-    //biblioteca de cores 
+    //Estrutura de cores e estilos
+    const string RESET      = "\033[0m";
     const string BOLD       = "\033[1m";
 
     const string C_BLACK    = "\033[30m";
@@ -30,7 +31,7 @@ struct Paint{
 
 
 struct SegregacaoConfig{
-    //conf da matriz
+    //Configuracão da matriz
     int tamanho_mt = 50;
     unsigned seed;
     int tolerancia = 4;
@@ -64,9 +65,8 @@ int main(){
 
 
 void imprimir_matriz(int mt[], int tamanho_mt){
-    // Imprime na tela a matriz de bairro
-    // param: int mt[] matriz a ser imprimida
-    // param: int tamanho_mt tamanho total de array
+    // Imprime na tela a matriz de principal
+
     Paint p;
     const string RESET_COLOR = p.C_BLACK;
 
@@ -101,7 +101,7 @@ void imprimir_matriz(int mt[], int tamanho_mt){
 
 
 void iniciar_matriz(int mt[], SegregacaoConfig conf){
-    // Inicia a matriz bairro de modo que todos os termos sejam randomizados
+    // Inicia a matriz principal de modo que todos os termos sejam randomizados
     
     int i;
 
@@ -126,7 +126,8 @@ void iniciar_matriz(int mt[], SegregacaoConfig conf){
 
 
 void iniciar_matriz_null_map(int mt_first[], int mt_null_map[], int tamanho_mt){
-    // inicia a matriz mapa, que contendo todas as casas vazias
+    //Inicia o vetor null_map
+    //Contem todos os indices das casas vazias da matriz principal
 
     int j = 0;
     for (int i = 0; i < pow(tamanho_mt, 2); i++) {
@@ -139,15 +140,16 @@ void iniciar_matriz_null_map(int mt_first[], int mt_null_map[], int tamanho_mt){
 
 
 int verify_eight(int mt[], int indice, int tamanho_mt) {
+    //Verifica os oito lados de um elemento de uma matriz unidimencial
+    //Retorna a quantidade de elementos diferentes do indice especificado
+
     if (mt[indice] == 0) return 0;
     
     int pts = 0;
 
-    // Coordenadas do ponto central
     int row = indice / tamanho_mt;
     int col = indice % tamanho_mt;
 
-    // Array de deslocamentos para os oito vizinhos
     int dRow[] = {-1, -1, -1, 0, 0, 1, 1, 1};
     int dCol[] = {-1, 0, 1, -1, 1, -1, 0, 1};
 
@@ -156,7 +158,6 @@ int verify_eight(int mt[], int indice, int tamanho_mt) {
         int newCol = col + dCol[i];
         int newIndex = newRow * tamanho_mt + newCol;
 
-        // Verifica se o novo índice está dentro dos limites
         if (newRow >= 0 && newRow < tamanho_mt && newCol >= 0 && newCol < tamanho_mt) {
             if (mt[indice] != mt[newIndex] && mt[newIndex] != 0) {
                 ++pts;
@@ -169,8 +170,10 @@ int verify_eight(int mt[], int indice, int tamanho_mt) {
 
 
 void schering_model(int mt[], int null_map[], SegregacaoConfig conf){
-    while (true){
-        bool alterou = false;
+    //Verifica o grau de satisfação de cada elemento
+    //Se o elemento se encontrar insadisfeiro ele busca aleatoriamente uma casa vazia e se muda
+    //Enquanto ouver mudanca, os elementos continuam se alterando 
+
         for (int i = 0; i < pow(conf.tamanho_mt, 2); i++){
             int pts;
             pts = verify_eight(mt, i, conf.tamanho_mt);
