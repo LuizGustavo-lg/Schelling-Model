@@ -32,10 +32,13 @@ struct Paint{
 
 struct SegregacaoConfig{
     //Configuracão da matriz
-    int tamanho_mt = 50;
+    int tamanho_mt = 20;
     unsigned seed;
     int tolerancia = 4;
-    float tx_casas_vazias = 0.05;
+    float tx_casas_vazias = 0.2;
+    int total_casas;
+
+    
 };
 
 void imprimir_matriz(int mt[], int tamanho_mt);
@@ -47,56 +50,66 @@ void schering_model(int mt[], int null_map[], SegregacaoConfig conf);
 
 int main(){
     SegregacaoConfig conf;
-    conf.seed = time(0);
+    cout << "Informe o tamanho da matrix que vc deseja: ";
+    cin >> conf.tamanho_mt;
+    
+    float r;
+    cout << "Informe o nivel de tolerancia: ";
+    cin >> r;
+    conf.tolerancia = (r*8)/100;
+    
+    cout << "Informe o a porcentagem, de casas vazias: ";
+    cin >> r;
+    conf.tx_casas_vazias = r/100;
+    
+    
     int bairro[conf.tamanho_mt*conf.tamanho_mt];
     int null_map[(int) ((conf.tamanho_mt*conf.tamanho_mt) * conf.tx_casas_vazias)];
     
+    conf.total_casas = pow(conf.tamanho_mt, 2);
+    conf.seed = time(0);
     srand(conf.seed);
 
-    iniciar_matriz(bairro, conf);
-    
-    iniciar_matriz_null_map(bairro, null_map, conf.tamanho_mt);
 
-    imprimir_matriz(bairro, conf.tamanho_mt);
+    iniciar_matriz(bairro, conf);
+    iniciar_matriz_null_map(bairro, null_map, conf.tamanho_mt);
 
     schering_model(bairro, null_map, conf);
 
 }
 
 
-void imprimir_matriz(int mt[], int tamanho_mt){
+void imprimir_matriz(int mt[], SegregacaoConfig conf){
     // Imprime na tela a matriz de principal
 
     Paint p;
-    const string RESET_COLOR = p.C_BLACK;
 
-    cout << '\n';
+    cout << "\n\t";
     cout << p.BOLD;
-    for (int i = 0; i < pow(tamanho_mt, 2); i++){
+    for (int i = 0; i < conf.total_casas; i++){
         switch (mt[i]){
         case 1:
-            cout << p.C_MAGENTA;
+            cout << p.C_MAGENTA << p.BG_MAGENTA;
             break;
         case 2:
-            cout << p.C_CYAN;
+            cout << p.C_CYAN << p.BG_CYAN;
             break;
         case 0:
-            cout << p.C_GRAY;
+            cout << p.C_GRAY << p.BG_GRAY;
             break;
         default:
-            cout << RESET_COLOR;
+            cout << p.RESET;
             break;
         }
         
         cout << setw(2) << mt[i];
 
-        if ((i+1)%tamanho_mt == 0) {
-            cout << RESET_COLOR << '\n';
+        if ((i+1)%conf.tamanho_mt == 0) {
+            cout << p.RESET << '\n' << '\t';
 
         };
     }
-    cout << RESET_COLOR;
-
+    cout << p.RESET;
 }
 
 
@@ -104,17 +117,18 @@ void iniciar_matriz(int mt[], SegregacaoConfig conf){
     // Inicia a matriz principal de modo que todos os termos sejam randomizados
     
     int i;
+    int total_ocupadas = conf.total_casas * (1 - conf.tx_casas_vazias);
 
-    for (i = 0; i < pow(conf.tamanho_mt, 2)*(1-conf.tx_casas_vazias); i+=2){
+    for (i = 0; i < total_ocupadas; i+=2){
         mt[i] = 1;
         mt[i+1] = 2;
     }
 
-    for (i; i < pow(conf.tamanho_mt, 2); i++){
+    for (i; i < conf.total_casas; i++){
         mt[i] = 0;
     }
 
-    for (int i = 0; i < pow(conf.tamanho_mt, 2); i++){
+    for (int i = 0; i < conf.total_casas; i++){
         int i_rand = rand() % (conf.tamanho_mt*conf.tamanho_mt); 
         int aux = mt[i];
 
@@ -130,7 +144,7 @@ void iniciar_matriz_null_map(int mt_first[], int mt_null_map[], int tamanho_mt){
     //Contem todos os indices das casas vazias da matriz principal
 
     int j = 0;
-    for (int i = 0; i < pow(tamanho_mt, 2); i++) {
+    for (int i = 0; i < tamanho_mt*tamanho_mt; i++) {
         if (mt_first[i] == 0){
             mt_null_map[j] = i;
             j++;
@@ -174,23 +188,31 @@ void schering_model(int mt[], int null_map[], SegregacaoConfig conf){
     //Se o elemento se encontrar insadisfeiro ele busca aleatoriamente uma casa vazia e se muda
     //Enquanto ouver mudanca, os elementos continuam se alterando 
 
-        for (int i = 0; i < pow(conf.tamanho_mt, 2); i++){
-            int pts;
-            pts = verify_eight(mt, i, conf.tamanho_mt);
+    int total_vazias = conf.total_casas * conf.tx_casas_vazias;
+    int alterou = 0;
+    int rodada = 0;
+
+    do {
+        alterou = 0;
+        ++rodada;
+
+        for (int i = 0; i < pow(conf.tamanho_mt, 2); i++) {
+            int pts = verify_eight(mt, i, conf.tamanho_mt);
             
             if (pts > conf.tolerancia) {
-                int indice_null_map = rand() % (int) ((conf.tamanho_mt*conf.tamanho_mt) * conf.tx_casas_vazias);
+                int indice_null_map = rand() % total_vazias;
+                int null_pos = null_map[indice_null_map];
 
-                mt[null_map[indice_null_map]] = mt[i];
+                mt[null_pos] = mt[i];
                 mt[i] = 0;
                 null_map[indice_null_map] = i;
-                alterou = true;
+                ++alterou;
+
             }
         }
 
-        imprimir_matriz(mt, conf.tamanho_mt);
-
-        if (!alterou) break;
-    }
-    
+        imprimir_matriz(mt, conf);
+        cout << "Rodada: " << rodada << '\n';
+        cout << "\tSatisfação geral: " << 100-(alterou*100)/conf.total_casas << "% \n";;
+    } while (alterou);
 }
