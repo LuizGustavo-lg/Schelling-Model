@@ -1,5 +1,5 @@
 BIN = ./bin
-NAMEPROGAN = main
+NAMEPROGAN = SchellingModel
 
 all:
 	g++ main.cpp -o ${BIN}/${NAMEPROGAN}
