@@ -85,8 +85,8 @@ void print_matrix(int mt[], SegregacaoConfig conf){
     Paint p;
 
     cout << "\n\t";
-    cout << p.BOLD;
     for (int i = 0; i < conf.total_casas; i++){
+        cout << p.BOLD;
         switch (mt[i]){
         case 1:
             cout << p.C_MAGENTA << p.BG_MAGENTA;
