@@ -43,9 +43,9 @@ struct SegregacaoConfig{
 
 void print_matrix(int mt[], int tamanho_mt);
 void set_matrix(int mt[], SegregacaoConfig conf);
-void set_matrix_null_map(int mt_first[], int mt_null_map[], int tamanho_mt);
+void set_matrix_null_map(int mt_first[], int mt_null_map[], SegregacaoConfig conf);
 int  verify_eight(int mt[], int indice, int tamanho_mt);
-void schering_model(int mt[], int null_map[], SegregacaoConfig conf);
+void schelling_model(int mt[], int null_map[], SegregacaoConfig conf);
 
 
 int main(){
@@ -63,18 +63,19 @@ int main(){
     conf.tx_casas_vazias = r/100;
     
     
-    int bairro[conf.tamanho_mt*conf.tamanho_mt];
-    int null_map[(int) ((conf.tamanho_mt*conf.tamanho_mt) * conf.tx_casas_vazias)];
-    
     conf.total_casas = pow(conf.tamanho_mt, 2);
+
+    int bairro[conf.total_casas];
+    int null_map[(int) (conf.total_casas * conf.tx_casas_vazias)];
+    
     conf.seed = time(0);
     srand(conf.seed);
 
 
     set_matrix(bairro, conf);
-    set_matrix_null_map(bairro, null_map, conf.tamanho_mt);
+    set_matrix_null_map(bairro, null_map, conf);
 
-    schering_model(bairro, null_map, conf);
+    schelling_model(bairro, null_map, conf);
 
 }
 
@@ -129,7 +130,7 @@ void set_matrix(int mt[], SegregacaoConfig conf){
     }
 
     for (int i = 0; i < conf.total_casas; i++){
-        int i_rand = rand() % (conf.tamanho_mt*conf.tamanho_mt); 
+        int i_rand = rand() % (conf.total_casas); 
         int aux = mt[i];
 
         mt[i] = mt[i_rand];
@@ -139,12 +140,12 @@ void set_matrix(int mt[], SegregacaoConfig conf){
 }
 
 
-void set_matrix_null_map(int mt_first[], int mt_null_map[], int tamanho_mt){
+void set_matrix_null_map(int mt_first[], int mt_null_map[], SegregacaoConfig conf){
     //Inicia o vetor null_map
     //Contem todos os indices das casas vazias da matriz principal
 
     int j = 0;
-    for (int i = 0; i < tamanho_mt*tamanho_mt; i++) {
+    for (int i = 0; i < conf.total_casas; i++) {
         if (mt_first[i] == 0){
             mt_null_map[j] = i;
             j++;
@@ -183,7 +184,7 @@ int verify_eight(int mt[], int indice, int tamanho_mt) {
 }
 
 
-void schering_model(int mt[], int null_map[], SegregacaoConfig conf){
+void schelling_model(int mt[], int null_map[], SegregacaoConfig conf){
     //Verifica o grau de satisfação de cada elemento
     //Se o elemento se encontrar insadisfeiro ele busca aleatoriamente uma casa vazia e se muda
     //Enquanto ouver mudanca, os elementos continuam se alterando 
@@ -196,7 +197,7 @@ void schering_model(int mt[], int null_map[], SegregacaoConfig conf){
         alterou = 0;
         ++rodada;
 
-        for (int i = 0; i < pow(conf.tamanho_mt, 2); i++) {
+        for (int i = 0; i < conf.total_casas; i++) {
             int pts = verify_eight(mt, i, conf.tamanho_mt);
             
             if (pts > conf.tolerancia) {
@@ -213,6 +214,6 @@ void schering_model(int mt[], int null_map[], SegregacaoConfig conf){
 
         print_matrix(mt, conf);
         cout << "Rodada: " << rodada << '\n';
-        cout << "\tSatisfação geral: " << 100-(alterou*100)/conf.total_casas << "% \n";;
+        cout << "\tSatisfação geral: " << 100-(alterou*100)/conf.total_casas << "% \n";
     } while (alterou);
 }
