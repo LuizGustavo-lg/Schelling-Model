@@ -41,9 +41,9 @@ struct SegregacaoConfig{
     
 };
 
-void imprimir_matriz(int mt[], int tamanho_mt);
-void iniciar_matriz(int mt[], SegregacaoConfig conf);
-void iniciar_matriz_null_map(int mt_first[], int mt_null_map[], int tamanho_mt);
+void print_matrix(int mt[], int tamanho_mt);
+void set_matrix(int mt[], SegregacaoConfig conf);
+void set_matrix_null_map(int mt_first[], int mt_null_map[], int tamanho_mt);
 int  verify_eight(int mt[], int indice, int tamanho_mt);
 void schering_model(int mt[], int null_map[], SegregacaoConfig conf);
 
@@ -58,7 +58,7 @@ int main(){
     cin >> r;
     conf.tolerancia = (r*8)/100;
     
-    cout << "Informe o a porcentagem, de casas vazias: ";
+    cout << "Informe a porcentagem, de casas vazias: ";
     cin >> r;
     conf.tx_casas_vazias = r/100;
     
@@ -71,15 +71,15 @@ int main(){
     srand(conf.seed);
 
 
-    iniciar_matriz(bairro, conf);
-    iniciar_matriz_null_map(bairro, null_map, conf.tamanho_mt);
+    set_matrix(bairro, conf);
+    set_matrix_null_map(bairro, null_map, conf.tamanho_mt);
 
     schering_model(bairro, null_map, conf);
 
 }
 
 
-void imprimir_matriz(int mt[], SegregacaoConfig conf){
+void print_matrix(int mt[], SegregacaoConfig conf){
     // Imprime na tela a matriz de principal
 
     Paint p;
@@ -113,7 +113,7 @@ void imprimir_matriz(int mt[], SegregacaoConfig conf){
 }
 
 
-void iniciar_matriz(int mt[], SegregacaoConfig conf){
+void set_matrix(int mt[], SegregacaoConfig conf){
     // Inicia a matriz principal de modo que todos os termos sejam randomizados
     
     int i;
@@ -139,7 +139,7 @@ void iniciar_matriz(int mt[], SegregacaoConfig conf){
 }
 
 
-void iniciar_matriz_null_map(int mt_first[], int mt_null_map[], int tamanho_mt){
+void set_matrix_null_map(int mt_first[], int mt_null_map[], int tamanho_mt){
     //Inicia o vetor null_map
     //Contem todos os indices das casas vazias da matriz principal
 
@@ -211,7 +211,7 @@ void schering_model(int mt[], int null_map[], SegregacaoConfig conf){
             }
         }
 
-        imprimir_matriz(mt, conf);
+        print_matrix(mt, conf);
         cout << "Rodada: " << rodada << '\n';
         cout << "\tSatisfação geral: " << 100-(alterou*100)/conf.total_casas << "% \n";;
     } while (alterou);
