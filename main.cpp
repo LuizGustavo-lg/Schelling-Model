@@ -36,7 +36,8 @@ struct SegregacaoConfig{
     int tamanho_mt = 20;
     unsigned seed;
     int tolerancia = 4;
-    float tx_casas_vazias = 0.2;
+    float tx_casas_vazias = 0.1;
+    int delay_print = 0;
     int total_casas;
 
     
@@ -64,6 +65,10 @@ int main(int argc, char* argv[]){
         } else if( op == "--empty" || op == "-e" ){
             int e = atoi(argv[i+1]);
             conf.tx_casas_vazias = (float) e/100;
+
+        } else if( op == "--delay" || op == "-d" ){
+            int d = atoi(argv[i+1]);
+            conf.delay_print = d*1000;
         
         } else if( op == "--help" || op == "-h"){
 
@@ -72,9 +77,10 @@ int main(int argc, char* argv[]){
             << "\n\t SchellingModel [OPTIONS]\n"
 
             << "\nOPTIONS:"
-            << "\n\t -s, --size\n\t\tTamanho da matriz. <numeric>\n"
-            << "\n\t -t, --tolerance\n\t\tNivel de tolerancia da populacao. <numeric>\n"
-            << "\n\t -e, --empty\n\t\tPorcentagem de casas vazias. <numeric>\n"
+            << "\n\t -s, --size\n\t\tTamanho da matriz. <numeric> default=20\n"
+            << "\n\t -t, --tolerance\n\t\tNivel de tolerancia da populacao [porcent]. <numeric> default=50\n"
+            << "\n\t -e, --empty\n\t\tPorcentagem de casas vazias [porcent]. <numeric> default=10\n"
+            << "\n\t -d, --delay\n\t\tTempo para imprimir uma nova matriz e excluir a anterior [milisegundo]. <numeric> default=0\n"
             << "\n\t -h, --help\n\t\tExibe mensagem de ajuda.\n\n";
 
             exit(0);
@@ -230,8 +236,11 @@ void schelling_model(int mt[], int null_map[], SegregacaoConfig conf){
 
             }
         }
-        usleep(300000);
-        system("clear");
+
+        if (conf.delay_print){
+            usleep(conf.delay_print);
+            system("clear");
+        }
         print_matrix(mt, conf);
         cout << "Rodada: " << rodada << '\n';
         cout << "\tSatisfação geral: " << 100-(alterou*100)/conf.total_casas << "% \n";
