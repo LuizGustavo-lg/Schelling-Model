@@ -52,6 +52,7 @@ void schelling_model(int mt[], int null_map[], SegregacaoConfig conf);
 
 int main(int argc, char* argv[]){
     SegregacaoConfig conf;
+    conf.seed = time(0);
 
     for (int i = 1; i < argc; i++){
         string op = argv[i];
@@ -69,6 +70,10 @@ int main(int argc, char* argv[]){
         } else if( op == "--delay" || op == "-d" ){
             int d = atoi(argv[i+1]);
             conf.delay_print = d*1000;
+
+        } else if( op == "--seed"){
+            int s = atoi(argv[i+1]);
+            conf.seed = s;
         
         } else if( op == "--help" || op == "-h"){
 
@@ -81,6 +86,7 @@ int main(int argc, char* argv[]){
             << "\n\t -t, --tolerance\n\t\tNivel de tolerancia da populacao [porcent]. <numeric> default=50\n"
             << "\n\t -e, --empty\n\t\tPorcentagem de casas vazias [porcent]. <numeric> default=10\n"
             << "\n\t -d, --delay\n\t\tTempo para imprimir uma nova matriz e excluir a anterior [milisegundo]. <numeric> default=0\n"
+            << "\n\t --seed\n\t\tSeed para randomização. <numeric> default=time\n"
             << "\n\t -h, --help\n\t\tExibe mensagem de ajuda.\n\n";
 
             exit(0);
@@ -93,7 +99,6 @@ int main(int argc, char* argv[]){
     int bairro[conf.total_casas];
     int null_map[(int) (conf.total_casas * conf.tx_casas_vazias)];
     
-    conf.seed = time(0);
     srand(conf.seed);
 
 
