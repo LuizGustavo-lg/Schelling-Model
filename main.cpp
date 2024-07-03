@@ -115,20 +115,22 @@ void print_matrix(int mt[], SegregacaoConfig conf){
         cout << p.BOLD;
         switch (mt[i]){
         case 1:
-            cout << p.C_MAGENTA << p.BG_MAGENTA;
+            cout << p.C_BLUE;
+            cout << setw(4) << "●";
             break;
         case 2:
-            cout << p.C_CYAN << p.BG_CYAN;
+            cout << p.C_RED;
+            cout << setw(4) << "●";
             break;
         case 0:
-            cout << p.C_GRAY << p.BG_GRAY;
+            cout << p.C_GRAY;
+            cout << setw(2) << "";
             break;
         default:
             cout << p.RESET;
             break;
         }
         
-        cout << setw(2) << mt[i];
 
         if ((i+1)%conf.tamanho_mt == 0) {
             cout << p.RESET << '\n' << '\t';
