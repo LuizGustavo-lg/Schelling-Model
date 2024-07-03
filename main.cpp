@@ -121,11 +121,11 @@ void print_matrix(int mt[], SegregacaoConfig conf){
         switch (mt[i]){
         case 1:
             cout << p.C_BLUE;
-            cout << setw(4) << "●";
+            cout << " ●";
             break;
         case 2:
             cout << p.C_RED;
-            cout << setw(4) << "●";
+            cout << " ●";
             break;
         case 0:
             cout << p.C_GRAY;
