@@ -214,7 +214,7 @@ void schelling_model(int mt[], int null_map[], SegregacaoConfig conf){
 
         print_matrix(mt, conf);
         cout << "Rodada: " << rodada << '\n';
-        cout << "\tSatisfação geral: " << 100-(alterou*100)/conf.total_casas << "% \n";
+        cout << "\tSatisfação geral: " << setprecision(4) << 100-(alterou*100)/(float)conf.total_casas << "% \n";
     } while (alterou);
 
     cout << "\nTotal de casas: " << conf.total_casas << " [" << conf.tamanho_mt << "/" << conf.tamanho_mt << "]"
