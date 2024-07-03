@@ -49,19 +49,37 @@ int  verify_eight(int mt[], int indice, int tamanho_mt);
 void schelling_model(int mt[], int null_map[], SegregacaoConfig conf);
 
 
-int main(){
+int main(int argc, char* argv[]){
     SegregacaoConfig conf;
-    cout << "Informe o tamanho da matrix que vc deseja: ";
-    cin >> conf.tamanho_mt;
-    
-    float r;
-    cout << "Informe o nivel de tolerancia: ";
-    cin >> r;
-    conf.tolerancia = (r*8)/100;
-    
-    cout << "Informe a porcentagem, de casas vazias: ";
-    cin >> r;
-    conf.tx_casas_vazias = r/100;
+
+    for (int i = 1; i < argc; i++){
+        string op = argv[i];
+        if ( op == "--size" || op == "-s" ) {
+            conf.tamanho_mt = atoi(argv[i+1]);
+
+        } else if( op == "--tolerance" || op == "-t" ){
+            int t = atoi(argv[i+1]);
+            conf.tolerancia = (t*8)/100;
+
+        } else if( op == "--empty" || op == "-e" ){
+            int e = atoi(argv[i+1]);
+            conf.tx_casas_vazias = (float) e/100;
+        
+        } else if( op == "--help" || op == "-h"){
+
+            cout 
+            << "\nUSAGE:"
+            << "\n\t SchellingModel [OPTIONS]\n"
+
+            << "\nOPTIONS:"
+            << "\n\t -s, --size\n\t\tTamanho da matriz. <numeric>\n"
+            << "\n\t -t, --tolerance\n\t\tNivel de tolerancia da populacao. <numeric>\n"
+            << "\n\t -e, --empty\n\t\tPorcentagem de casas vazias. <numeric>\n"
+            << "\n\t -h, --help\n\t\tExibe mensagem de ajuda.\n\n";
+
+            exit(0);
+        }
+    }
     
     
     conf.total_casas = pow(conf.tamanho_mt, 2);
