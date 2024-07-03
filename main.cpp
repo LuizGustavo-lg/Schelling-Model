@@ -2,6 +2,7 @@
 #include <ctime>
 #include <iomanip>
 #include <cmath>
+#include <unistd.h>
 
 using namespace std;
 
@@ -211,10 +212,12 @@ void schelling_model(int mt[], int null_map[], SegregacaoConfig conf){
 
             }
         }
-
+        usleep(300000);
+        system("clear");
         print_matrix(mt, conf);
         cout << "Rodada: " << rodada << '\n';
         cout << "\tSatisfação geral: " << 100-(alterou*100)/conf.total_casas << "% \n";
+
     } while (alterou);
 
     cout << "\nTotal de casas: " << conf.total_casas << " [" << conf.tamanho_mt << "/" << conf.tamanho_mt << "]"
