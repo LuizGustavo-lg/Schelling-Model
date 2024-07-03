@@ -37,7 +37,7 @@ struct SegregacaoConfig{
     int tolerancia = 4;
     float tx_casas_vazias = 0.2;
     int total_casas;
-
+    int max_rodada = 10000;
     
 };
 
@@ -215,7 +215,7 @@ void schelling_model(int mt[], int null_map[], SegregacaoConfig conf){
         print_matrix(mt, conf);
         cout << "Rodada: " << rodada << '\n';
         cout << "\tSatisfação geral: " << setprecision(4) << 100-(alterou*100)/(float)conf.total_casas << "% \n";
-    } while (alterou);
+    } while (alterou && rodada<conf.max_rodada);
 
     cout << "\nTotal de casas: " << conf.total_casas << " [" << conf.tamanho_mt << "/" << conf.tamanho_mt << "]"
     << "\nTolerancia: " << conf.tolerancia << "/8" 
