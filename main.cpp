@@ -2,6 +2,7 @@
 #include <ctime>
 #include <iomanip>
 #include <cmath>
+#include <unistd.h>
 
 using namespace std;
 
@@ -35,7 +36,8 @@ struct SegregacaoConfig{
     int tamanho_mt = 20;
     unsigned seed;
     int tolerancia = 4;
-    float tx_casas_vazias = 0.2;
+    float tx_casas_vazias = 0.1;
+    int delay_print = 0;
     int total_casas;
     int max_rodada = 10000;
     
@@ -48,19 +50,48 @@ int  verify_eight(int mt[], int indice, int tamanho_mt);
 void schelling_model(int mt[], int null_map[], SegregacaoConfig conf);
 
 
-int main(){
+int main(int argc, char* argv[]){
     SegregacaoConfig conf;
-    cout << "Informe o tamanho da matrix que vc deseja: ";
-    cin >> conf.tamanho_mt;
-    
-    float r;
-    cout << "Informe o nivel de tolerancia: ";
-    cin >> r;
-    conf.tolerancia = (r*8)/100;
-    
-    cout << "Informe a porcentagem, de casas vazias: ";
-    cin >> r;
-    conf.tx_casas_vazias = r/100;
+    conf.seed = time(0);
+
+    for (int i = 1; i < argc; i++){
+        string op = argv[i];
+        if ( op == "--size" || op == "-s" ) {
+            conf.tamanho_mt = atoi(argv[i+1]);
+
+        } else if( op == "--tolerance" || op == "-t" ){
+            int t = atoi(argv[i+1]);
+            conf.tolerancia = (t*8)/100;
+
+        } else if( op == "--empty" || op == "-e" ){
+            int e = atoi(argv[i+1]);
+            conf.tx_casas_vazias = (float) e/100;
+
+        } else if( op == "--delay" || op == "-d" ){
+            int d = atoi(argv[i+1]);
+            conf.delay_print = d*1000;
+
+        } else if( op == "--seed"){
+            int s = atoi(argv[i+1]);
+            conf.seed = s;
+        
+        } else if( op == "--help" || op == "-h"){
+
+            cout 
+            << "\nUSAGE:"
+            << "\n\t SchellingModel [OPTIONS]\n"
+
+            << "\nOPTIONS:"
+            << "\n\t -s, --size\n\t\tTamanho da matriz. <numeric> default=20\n"
+            << "\n\t -t, --tolerance\n\t\tNivel de tolerancia da populacao [porcent]. <numeric> default=50\n"
+            << "\n\t -e, --empty\n\t\tPorcentagem de casas vazias [porcent]. <numeric> default=10\n"
+            << "\n\t -d, --delay\n\t\tTempo para imprimir uma nova matriz e excluir a anterior [milisegundo]. <numeric> default=0\n"
+            << "\n\t --seed\n\t\tSeed para randomização. <numeric> default=time\n"
+            << "\n\t -h, --help\n\t\tExibe mensagem de ajuda.\n\n";
+
+            exit(0);
+        }
+    }
     
     
     conf.total_casas = pow(conf.tamanho_mt, 2);
@@ -68,7 +99,6 @@ int main(){
     int bairro[conf.total_casas];
     int null_map[(int) (conf.total_casas * conf.tx_casas_vazias)];
     
-    conf.seed = time(0);
     srand(conf.seed);
 
 
@@ -90,20 +120,22 @@ void print_matrix(int mt[], SegregacaoConfig conf){
         cout << p.BOLD;
         switch (mt[i]){
         case 1:
-            cout << p.C_MAGENTA << p.BG_MAGENTA;
+            cout << p.C_BLUE;
+            cout << " ●";
             break;
         case 2:
-            cout << p.C_CYAN << p.BG_CYAN;
+            cout << p.C_RED;
+            cout << " ●";
             break;
         case 0:
-            cout << p.C_GRAY << p.BG_GRAY;
+            cout << p.C_GRAY;
+            cout << setw(2) << "";
             break;
         default:
             cout << p.RESET;
             break;
         }
         
-        cout << setw(2) << mt[i];
 
         if ((i+1)%conf.tamanho_mt == 0) {
             cout << p.RESET << '\n' << '\t';
@@ -212,6 +244,10 @@ void schelling_model(int mt[], int null_map[], SegregacaoConfig conf){
             }
         }
 
+        if (conf.delay_print){
+            usleep(conf.delay_print);
+            system("clear");
+        }
         print_matrix(mt, conf);
         cout << "Rodada: " << rodada << '\n';
         cout << "\tSatisfação geral: " << setprecision(4) << 100-(alterou*100)/(float)conf.total_casas << "% \n";
