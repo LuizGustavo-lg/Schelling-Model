@@ -149,15 +149,14 @@ void print_matrix(int mt[], SegregacaoConfig conf){
 void set_matrix(int mt[], SegregacaoConfig conf){
     // Inicia a matriz principal de modo que todos os termos sejam randomizados
     
-    int i;
     int total_ocupadas = conf.total_casas * (1 - conf.tx_casas_vazias);
 
-    for (i = 0; i < total_ocupadas; i+=2){
+    for (int i = 0; i < total_ocupadas; i+=2){
         mt[i] = 1;
         mt[i+1] = 2;
     }
 
-    for (i; i < conf.total_casas; i++){
+    for (int i = total_ocupadas; i < conf.total_casas; i++){
         mt[i] = 0;
     }
 
