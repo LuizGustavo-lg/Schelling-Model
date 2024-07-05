@@ -43,7 +43,7 @@ struct SegregacaoConfig{
     
 };
 
-void print_matrix(int mt[], int tamanho_mt);
+void print_matrix(int mt[], SegregacaoConfig conf);
 void set_matrix(int mt[], SegregacaoConfig conf);
 void set_matrix_null_map(int mt_first[], int mt_null_map[], SegregacaoConfig conf);
 int  verify_eight(int mt[], int indice, int tamanho_mt);
