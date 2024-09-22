@@ -16,6 +16,8 @@ O **modelo de segregação de Schelling** é uma simulação baseada em agentes 
 
 Neste código, a matriz representa uma vizinhança, onde cada célula pode estar ocupada por um indivíduo de um dos dois grupos ou pode estar vazia. A simulação itera diversas rodadas, ajustando as posições dos indivíduos com base em sua tolerância à diversidade entre os vizinhos.
 
+![schelling](https://github.com/user-attachments/assets/f8760b68-6430-43b6-a620-2ad1f51de39e)
+
 ## Funcionalidades
 
 - Simulação da segregação social com base em uma matriz bidimensional.
