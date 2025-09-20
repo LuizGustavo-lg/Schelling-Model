@@ -32,7 +32,7 @@ struct Paint{
 
 
 struct SegregacaoConfig{
-    //Configuracão da matriz
+    //Configuração da matriz
     int tamanho_mt = 20;
     unsigned seed;
     int tolerancia = 4;
