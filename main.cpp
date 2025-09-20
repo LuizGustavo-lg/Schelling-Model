@@ -217,7 +217,7 @@ int verify_eight(int mt[], int indice, int tamanho_mt) {
 
 void schelling_model(int mt[], int null_map[], SegregacaoConfig conf){
     //Verifica o grau de satisfação de cada elemento
-    //Se o elemento se encontrar insadisfeiro ele busca aleatoriamente uma casa vazia e se muda
+    //Se o elemento se encontrar insatisfeito ele busca aleatoriamente uma casa vazia e se muda
     //Enquanto ouver mudanca, os elementos continuam se alterando 
 
     int total_vazias = conf.total_casas * conf.tx_casas_vazias;
